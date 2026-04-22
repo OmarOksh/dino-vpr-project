@@ -5,7 +5,7 @@ Running this script produces:
   notebooks/01_dino_feature_exploration.ipynb
   notebooks/02_dino_mini_training.ipynb
 
-The notebooks are checked into the repository; this script is the source of truth.
+The notebooks are checked into the repository; this script is the source of truth
 (regenerate by running ``python scripts/build_notebooks.py``).
 """
 
@@ -139,7 +139,7 @@ It exposes a standard transformers interface: forward returns `last_hidden_state
 from transformers import AutoModel, AutoImageProcessor
 
 HF_ID = "facebook/dinov2-base"
-model = AutoModel.from_pretrained(HF_ID).to(DEVICE).eval()
+model = AutoModel.from_pretrained(HF_ID, attn_implementation="eager").to(DEVICE).eval()
 processor = AutoImageProcessor.from_pretrained(HF_ID, use_fast=True)
 
 # Freeze (paranoia — transformers returns eval() but we never want grads)
@@ -196,6 +196,13 @@ def forward_with_attention(img_pil):
     inputs = processor(images=img_pil, return_tensors="pt").to(DEVICE)
     with torch.no_grad():
         out = model(**inputs, output_attentions=True)
+    if out.attentions is None:
+        raise RuntimeError(
+            "out.attentions is None. This happens when the model uses SDPA or "
+            "flash_attention as its attention backend, neither of which returns "
+            "attention weights. Re-load the model with attn_implementation='eager':\\n"
+            "    model = AutoModel.from_pretrained(HF_ID, attn_implementation='eager')"
+        )
     # Last block's attention weights: (1, n_heads, N+1, N+1)
     last_attn = out.attentions[-1][0]  # drop batch dim
     # Patch grid side = sqrt(N_patches). For ViT-B/14 @ 224, patches = 16x16 = 256.
