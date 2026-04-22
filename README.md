@@ -138,3 +138,4 @@ Key references:
 - Tzachor et al., *EffoVPR: Effective Foundation Model Utilization for Visual Place Recognition*, arXiv:2405.18065, 2024.
 
 See `report/references.bib` for the full bibliography.
+# CS515-Image-foundation-models
