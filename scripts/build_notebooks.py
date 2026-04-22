@@ -5,7 +5,7 @@ Running this script produces:
   notebooks/01_dino_feature_exploration.ipynb
   notebooks/02_dino_mini_training.ipynb
 
-The notebooks are checked into the repository; this script is the source of truth
+The notebooks are checked into the repository; this script is the source of truth.
 (regenerate by running ``python scripts/build_notebooks.py``).
 """
 
